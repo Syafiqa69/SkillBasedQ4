@@ -1,0 +1,49 @@
+import socket
+import threading
+import random
+
+# List of quotes
+quotes = [
+    "Dream big and dare to fail - Norman Vaughan",
+    "Impossible is for the unwilling - John Keats",
+    "We can't help everyone, but everyone can help someone - Ronal Reagan",
+    "Excuses are the nails used to build a house of failure - Jim Rohn",
+    "Whether you think you can, or you think you can't - you're right ~ Henry Ford"
+]
+
+def handle_client(client_socket):
+    # Get a random quote
+    random_quote = random.choice(quotes)
+
+    # Send the quote to the client
+    client_socket.send(random_quote.encode())
+
+    # Close the connection with the client
+    client_socket.close()
+
+def main():
+    # Create server socket
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    # Bind the server socket to a specific address and port
+    server_address = ('192.168.248.134', 8888)
+    server_socket.bind(server_address)
+
+    # Listen for incoming connections (max 5 connections in the queue)
+    server_socket.listen(5)
+
+    print('QOTD Server is listening on port 8888...')
+
+    while True:
+        print('Waiting for a client to connect...')
+        # Accept a client connection
+        client_socket, client_address = server_socket.accept()
+        print('Client connected:', client_address)
+
+        # Create a new thread to handle the client request
+        client_thread = threading.Thread(target=handle_client, args=(client_socket,))
+        client_thread.start()
+
+if __name__ == '__main__':
+ main()
+
